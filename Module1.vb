@@ -1,4 +1,4 @@
-﻿'VER 17
+﻿'VER 18
 
 Imports System.IO
 Imports System
@@ -48,6 +48,7 @@ Module Module1
     Dim data_update_done As Boolean = False
 
     Dim donelist As Object
+
 
 
 
@@ -512,6 +513,7 @@ leave_program:
                     'If anAssembly = True Then
                     ' File.Copy(order.fullname, "s:\job\Dinesh_Assembly\" & order.name, True)
                     'End If
+
                     If onhold = False Then
                         File.Move(order.fullname, "c:\source\" & order.name)
                         Console.WriteLine(au & "   " & CStr(Now.Hour) & ":" & CStr(Now.Minute))
@@ -594,8 +596,6 @@ not_this_time:
         Return onhold
     End Function
 
-
-    '*************************
 
     Function AmIAssembly(ByVal order_num As String)
         Dim anAssembly As Boolean = False
@@ -1068,16 +1068,6 @@ slash_again:
                         ext31 = ext31 + 1
                     Loop
 
-
-
-
-
-
-
-
-
-
-
                 End If
 
 
@@ -1223,11 +1213,6 @@ leave1:
         id1 = Shell(fax_database, 1)
         wait(200)
 
-        'fax_database2 = "s:\job\in_house_software\faxback_insert_finish2.exe " & fax_database2
-        'id1 = Shell(fax_database2, 1)
-        'wait(200)
-
-
         ' --------------------------
 
         Dim au As String
@@ -1240,11 +1225,24 @@ leave1:
         id = Shell(to_database, 1)
         wait(200)
 
-        'to_database2 = "s:\job\in_house_software\status_insert_finish3_2.exe " & au
-        'id = Shell(to_database2, 1)
-        'wait(200)
-
         ' -------------------------------------
+
+        Dim faxArr(), orderArr() As String
+        Dim iAmHighSpec As Boolean = False
+        faxArr = fax_database.Split(",")
+        If faxArr(14) = "'1'" Then iAmHighSpec = True
+        If iAmHighSpec = True Then
+            au = UCase(faxArr(0)).Replace("'", "")
+            orderArr = au.Split(" ")
+            au = Trim(orderArr(1))
+            Try
+                CopyToDineshForNonPoolPanel(au)
+            Catch
+                'TODO Put catch in here Message that this order needs to be given to Dinesh for NON POOL panel 
+            End Try
+        End If
+
+        '-----------------------------
 
         to_dan = "s:\job\in_house_software\dan_insert_finish.exe " & to_dan
         ' id1 = Shell(to_dan, 1)
@@ -1253,6 +1251,25 @@ leave1:
 
     End Sub
 
+    Sub CopyToDineshForNonPoolPanel(ByVal au As String)
+        Dim file_source, destinationFolder As String
+        Dim file_folder As DirectoryInfo
+        Dim each_file As Object
+        Dim file_list As Object
+
+        destinationFolder = "S:\Job\Dinesh_HighSpec\"
+
+        file_source = "C:\SOURCE\"
+        file_folder = New DirectoryInfo(file_source)
+        file_list = file_folder.GetFileSystemInfos()
+
+        For Each each_file In file_list
+            If InStr(each_file.name, au) > 0 Then
+                File.Copy(each_file.fullname, destinationFolder & each_file.name)
+            End If
+        Next
+
+    End Sub
 
 
     Private Sub update_names(ByVal f_info As String)
