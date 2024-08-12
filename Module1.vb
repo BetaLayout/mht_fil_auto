@@ -1,4 +1,4 @@
-﻿'VER 18
+﻿'VER 19  07/02/2023
 
 Imports System.IO
 Imports System
@@ -10,10 +10,11 @@ Imports Microsoft.VisualBasic
 Imports System.Data.OleDb
 Module Module1
 
-    'Declare Sub Sleep Lib "Kernel32" Alias "Sleep" (ByVal dwMilliseconds As Long)
+    'Declare Sub Sleep  Lib "Kernel32" Alias "Sleep" (ByVal  dwMilliseconds As Long)
 
     Dim times_run As Integer
     Dim myarraylist As Object
+    Dim filepartlist As Object
     Dim uploadlist As Object
     Dim new_orders As Integer
     Dim on_hold_message As Boolean
@@ -180,6 +181,7 @@ not_this_time:
 
         on_hold_message = False
         myarraylist = CreateObject("System.Collections.ArrayList")
+        filepartlist = CreateObject("System.Collections.ArrayList")
         uploadlist = CreateObject("System.Collections.ArrayList")
 
         times_run = 0
@@ -236,7 +238,7 @@ check_again:
 
 no_network:
 
-        wait(450000)  ' about 10 mins '450000
+        wait(450000)  '  about 10 mins '450000
 
         'wait(5000)  ' For Testing
         'times_run = times_run
@@ -487,7 +489,7 @@ leave_program:
 
             If c < 10 Then
                 If InStr(UCase(order.name), ".ZIP") > 0 Then
-                    c = c + 1
+                    ' c = c + 1
                     dot = InStr(UCase(order.name), ".ZIP")
                     au = Mid(order.name, 1, dot - 1)
 
@@ -497,45 +499,61 @@ leave_program:
                         GoTo not_this_time
                     End If
 
+                    If InStr(UCase(order.name), ".FILEPART") > 0 Then
+                        If (filepartlist.contains(au)) Then
+                            Try
+                                Dim transferFail As StreamWriter
+                                transferFail = File.AppendText("T:\IN_HOUSE_SOFTWARE\ALL_SOFTWARE\Visual_Studio_2010\OMS-Download\TEMP\PreCAM_MoveFail.txt")
+                                transferFail.WriteLine("Taking a long time to transfer zip file into Work Finished Folder - " + au)
+                                transferFail.Close()
+                            Catch
+                            End Try
+                        Else
+                            filepartlist.add(au)
+                        End If
+                        GoTo not_this_time
+                    End If
+
                     new_orders = new_orders + 1
+                    c = c + 1
 
                     '************************************
-                    'seperate_on_holds
-                    onhold = False
-                    onhold = AmIOnHold(au)
+
                     'seperate Assembly Orders
                     'anAssembly = False
                     'anAssembly = AmIAssembly(au)
-
-                    'If InStr(order.name, "20140P01") > 0 Then GoTo skip_me
-                    ' If InStr(order.name, "24932P01") > 0 Then GoTo skip_me
-
                     'If anAssembly = True Then
-
                     ' File.Copy(order.fullname, "s:\job\Dinesh_Assembly\" & order.name, True)
                     'End If
 
-                    If onhold = False Then
-                        File.Move(order.fullname, "c:\source\" & order.name)
-                        Console.WriteLine(au & "   " & CStr(Now.Hour) & ":" & CStr(Now.Minute))
-                    Else
-                        File.Move(order.fullname, "t:\off_holds\" & order.name)
-                        onholds = True
-                        Tiff_Status_R(order.name)
+                    'seperate_on_holds
+                    onhold = False
+                    onhold = AmIOnHold(au)
+
+                    'If onhold = False Then
+                    ' File.Move(order.fullname, "c:\source\" & order.name)
+                    ' Console.WriteLine(au & "   " & CStr(Now.Hour) & ":" & CStr(Now.Minute))
+                    ' Else
+                    '     File.Move(order.fullname, "t:\off_holds\" & order.name)
+                    '     onholds = True
+                    '     Tiff_Status_R(order.name)
+                    '     Console.WriteLine(au & "   " & CStr(Now.Hour) & ":" & CStr(Now.Minute) & "--- OFF_HOLD")
+                    '     new_orders = new_orders - 1
+                    ' End If
+
+                    'Try without seperating them and use OMS to check/adjust del dates 07/02/2023
+                    File.Move(order.fullname, "c:\source\" & order.name)
+                    If onhold = True Then
                         Console.WriteLine(au & "   " & CStr(Now.Hour) & ":" & CStr(Now.Minute) & "--- OFF_HOLD")
-                        new_orders = new_orders - 1
+                    Else
+                        Console.WriteLine(au & "   " & CStr(Now.Hour) & ":" & CStr(Now.Minute))
                     End If
 skip_me:
 
                 End If
-                'c = c + 1
             End If
 
 not_this_time:
-
-            ' If (InStr(UCase(order.name), "_ONHOLD_") > 0) Then ' And new_orders > 0) Then
-            ' File.Move(order.fullname, "c:\source\" & order.name)
-            ' End If
 
             If (InStr(UCase(order.name), ".TXT") > 0) Then ' And new_orders > 0) Then
                 File.Move(order.fullname, "S:\Job\CAM-India\Work\new_data_for_work\Status_Updates\" & order.name)  ' They are then handles in here by FolderWatcher
@@ -545,13 +563,6 @@ not_this_time:
 
         Next
 
-        ' If onholds = True Then
-        ' 'MsgBox("THERE ARE SOME OFF HOLDS BACK FROM INDIA :-)")
-        ' Console.WriteLine("THERE ARE SOME OFF HOLDS BACK FROM INDIA ! .. IN C_OFF_HOLDS FOLDER")
-        ' on_hold_message = True
-        ' End If
-
-
     End Sub
 
 
@@ -560,15 +571,12 @@ not_this_time:
         Dim dash As Integer
         Dim au As String
 
-
-
         dash = order_num.IndexOf("-")
         If dash > 0 Then
             au = Mid(order_num, 1, dash)
         Else
             au = order_num
         End If
-
 
 
         ''''''''''''''''''

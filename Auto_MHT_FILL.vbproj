@@ -11,7 +11,7 @@
     <OutputType>Exe</OutputType>
     <StartupObject>ConsoleApplication1.Module1</StartupObject>
     <RootNamespace>ConsoleApplication1</RootNamespace>
-    <AssemblyName>Auto_MHT_FILL_VER18</AssemblyName>
+    <AssemblyName>Auto_MHT_FILL_VER19</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
@@ -39,7 +39,7 @@
     <DefineDebug>true</DefineDebug>
     <DefineTrace>true</DefineTrace>
     <OutputPath>bin\Debug\</OutputPath>
-    <DocumentationFile>Auto_MHT_FILL_VER18.xml</DocumentationFile>
+    <DocumentationFile>Auto_MHT_FILL_VER19.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
@@ -49,7 +49,7 @@
     <DefineTrace>true</DefineTrace>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DocumentationFile>Auto_MHT_FILL_VER18.xml</DocumentationFile>
+    <DocumentationFile>Auto_MHT_FILL_VER19.xml</DocumentationFile>
     <NoWarn>42016,41999,42017,42018,42019,42032,42036,42020,42021,42022</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
