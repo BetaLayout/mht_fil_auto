@@ -1,4 +1,4 @@
-﻿'VER 24 04/11/2025
+﻿'VER 26  13/01/2026
 
 Imports System.IO
 Imports Newtonsoft.Json
@@ -363,13 +363,6 @@ not_this_time:
                 Exit Sub
             End If
         End If
-
-        Dim folderwatch As Integer
-
-        ' folderwatch = MsgBox("1) Are FolderWatch Programs running  AND   2) Is all ok to continue ?", vbQuestion + vbYesNo, "Continue?")
-        folderwatch = MsgBox("Are FolderWatch Programs running ?", vbQuestion + vbYesNo, "Continue?")
-
-        If folderwatch = 7 Then GoTo leave_program
 
         Directory.CreateDirectory("s:\oms_data\applications\mht_fill_auto")
         Using copy_directory_batch_file As New StreamWriter("s:\oms_data\applications\mht_fill_auto\copy_directory.bat", False)
